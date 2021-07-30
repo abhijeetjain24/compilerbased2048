@@ -1,0 +1,55 @@
+%{
+    #include"assignment.h"
+    #include"assignment.tab.hpp"
+    #include<stdio.h>
+%}
+%option noyywrap
+%%
+"."   {return fullstop;}
+
+","   {return comma;}
+
+"ADD"   {yylval.num = ADD;
+        return add;}
+
+"SUBTRACT"   {yylval.num = SUBTRACT;
+                return subtract;}
+
+"MULTIPLY"   {yylval.num = MULTIPLY;
+                return multiply;}
+
+"DIVIDE"   {yylval.num = DIVIDE;
+            return divide;}
+
+"LEFT"  {   yylval.num = LEFT;
+            return left1;}
+
+"RIGHT"  {yylval.num = RIGHT;
+            return right1;}
+
+"UP"  {yylval.num = UP;
+        return up;}
+
+"DOWN"  {yylval.num = DOWN;
+        return down;}
+
+"ASSIGN" {return assign;}
+
+"VALUE" {return value;}
+
+"VAR"   {return var;}
+
+"TO"    {return to;}
+
+"IS"    {return is;}
+
+"IN"    {return in;}
+[\n]    {return newline;}
+[0-9]+ {    yylval.num = atoi(yytext);
+    return number;}//
+[ \t]+    ;
+ 
+[a-zA-Z0-9_\-@#\$%^&\*!\(\)\+\=\[\]\{\}\"\'\:\;\/\`\~\?\<\>]+ {yylval.id = new std::string(yytext);
+                                                                return identifier;}
+.   ;
+%%

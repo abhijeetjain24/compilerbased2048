@@ -1,0 +1,93 @@
+%{
+#include<iostream>
+#include<map>
+#include<vector>
+#include<string>
+#include"assignment.h"
+#include"assign.h"
+using namespace std;
+// int insert_random_tile();
+// int print_output(int error_code);//the function to print actual shit to stderr
+// int assign_value(int value,int x,int y);// returns appropriate error code
+// int Do_move(int operation,int direction);// 
+// int set_name(string *name,int x,int y);
+// int get_value(int x,int y);
+// int matrix[4][4]={0}; //maintains the values of the tiles on matrix
+// map<pair<int,int>,vector<string> > tile_names; //maintains the var name of tiles on matrix
+%}
+%code requires 
+{
+        #include<iostream>
+        #include<map>
+        #include<vector>
+        #include<string>
+        #include"assignment.h"
+        #include"assign.h"
+        using namespace std;
+        void yyerror (string s);
+        int yylex();
+}
+
+%union {int num; string* id;}         /* Yacc definitions */
+%start line
+%token <num> add subtract multiply divide up down right1 left1
+%token assign
+%token value 
+%token to
+%token newline
+%token is
+%token in
+%token var
+%token fullstop
+%token comma
+%token <num> number
+%token <id> identifier
+%type <num> naming line assignment move query operation direction wrong_assignment wrong_move wrong_naming wrong_query  
+%%
+
+line    :    assignment	{print_output($1);YYACCEPT;} 
+        | move		{print_output(0);YYACCEPT;}
+        | naming	{print_output($1);YYACCEPT;}
+        | query         {print_output($1);YYACCEPT;}
+        |wrong_assignment 
+        | wrong_move
+        |wrong_naming
+        | wrong_query  
+        ;
+
+assignment  : assign number to number comma number fullstop newline{$$ = assign_value($2,$4,$6);}   
+            ;
+wrong_assignment  : assign number to number comma number newline{fprintf(stderr,"-1\n");printf("Invalid Syntax\nEnter Next Command\n\n");YYABORT;}   
+            ;
+
+
+move    : operation direction fullstop  newline{Do_move($1,$2);}
+        ;  
+wrong_move    : operation direction newline {fprintf(stderr,"-1\n");printf("Invalid Syntax\nEnter Next Command\n\n");YYABORT;}
+        ;    
+operation       : add           {$$ = $1;}
+                | subtract      {$$ = $1;}
+                | multiply      {$$ = $1;}
+                | divide        {$$ = $1;}
+                ;
+direction       :left1            {$$ = $1;}
+                |right1           {$$ = $1;}
+                |up              {$$ = $1;}
+                |down            {$$ = $1;}
+                ;
+
+naming  : var identifier is number comma number fullstop newline{$$ = set_name($2,$4,$6);}
+        ;
+wrong_naming : var identifier is number comma number newline {fprintf(stderr,"-1\n");printf("Invalid Syntax\nEnter Next Command\n\n");YYABORT;}
+        ;
+
+query   : value in number comma number fullstop newline{$$ = get_value($3,$5);}
+        ;
+wrong_query   : value in number comma number newline {fprintf(stderr,"-1\n");printf("Invalid Syntax\nEnter Next Command\n\n");YYABORT;}
+        ;
+%%
+void yyerror(string s)
+{
+        
+       cout<<"syntax error\n\nEnter next command\n";
+}
